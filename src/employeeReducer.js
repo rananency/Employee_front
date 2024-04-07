@@ -1,4 +1,4 @@
-import { FETCH_EMPLOYEES_SUCCESS, ADD_EMPLOYEE_SUCCESS, DELETE_EMPLOYEE_SUCCESS } from './employeeAction';
+import { FETCH_EMPLOYEES_SUCCESS, ADD_EMPLOYEE_SUCCESS, DELETE_EMPLOYEE_SUCCESS, UPDATE_EMPLOYEE_SUCCESS } from './employeeAction';
 
 const initialState = {
     employees: [],
@@ -12,6 +12,11 @@ const employeeReducer = (state = initialState, action) => {
                 employees: action.payload,
             };
         case ADD_EMPLOYEE_SUCCESS:
+            return {
+                ...state,
+                employees: [...state.employees, action.payload],
+            };
+        case UPDATE_EMPLOYEE_SUCCESS:
             return {
                 ...state,
                 employees: [...state.employees, action.payload],

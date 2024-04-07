@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { fetchEmployees, addEmployee, deleteEmployee } from './employeeAction';
 import AddEmployeeModal from './addEmployeeModal';
+import { formateDate } from './utils'
 import {
     Button,
     Table,
@@ -24,7 +25,7 @@ const Employee = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const employees = useSelector((state) => state.employee.employees);
-
+    const [employeeData, setEmployeeData] = useState({});
     const [openModal, setOpenModal] = useState(false);
     const handleOpenModal = () => {
         setOpenModal(true);
@@ -39,25 +40,11 @@ const Employee = () => {
         dispatch(fetchEmployees())
     }, [dispatch]);
 
-    const handleAdd = (formData) => {
-        const confirmed = window.confirm('Are you sure you want to submit this form?');
-        if (confirmed) {
-            try {
-                dispatch(addEmployee(formData)).then((res) => {
-                    dispatch(fetchEmployees())
-                });
-            } catch (error) {
-                console.error('Error adding employee:', error);
-            }
-        }
-
-    };
-
-    const handleDelete = (index) => {
+    const handleDelete = (empid) => {
         const confirmed = window.confirm('Are you sure you want to delete?');
         if (confirmed) {
             try {
-                dispatch(deleteEmployee(index)).then((res) => {
+                dispatch(deleteEmployee(empid)).then((res) => {
                     dispatch(fetchEmployees())
                 });
             } catch (error) {
@@ -67,11 +54,12 @@ const Employee = () => {
 
     };
 
+
     return (
         <div>
             <h1>Employee Management APP</h1>
             <Button variant="contained" color="primary" onClick={handleOpenModal}>Add Employee</Button>
-            <AddEmployeeModal open={openModal} handleClose={handleCloseModal} handleAdd={handleAdd} />
+            <AddEmployeeModal open={openModal} handleClose={handleCloseModal} employeeData={employeeData} />
 
             <hr />
             <h2>Employees</h2>
@@ -93,11 +81,12 @@ const Employee = () => {
                                 <TableCell>{employee.name}</TableCell>
                                 <TableCell>{employee.age}</TableCell>
                                 <TableCell>{employee.email}</TableCell>
-                                <TableCell>{employee.dateOfBirth}</TableCell>
+                                <TableCell>{formateDate(employee.dateOfBirth)}</TableCell>
                                 <TableCell>{`${employee.address?.street}, ${employee.address?.city}, ${employee.address?.state}, ${employee.address?.zip}`}</TableCell>
                                 <TableCell>
                                     <Button variant="contained" color="secondary" onClick={() => handleDelete(employee._id)}>Delete</Button>
-                                    {/* Update button can be added here */}
+                                    <Button style={{ marginLeft: "7px" }} variant="contained" color="primary" onClick={() => { setEmployeeData(employee); handleOpenModal() }}>Edit</Button>
+
                                 </TableCell>
                             </TableRow>
                         ))}

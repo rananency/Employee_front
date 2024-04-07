@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@material-ui/core';
 import { useDispatch } from 'react-redux';
-import { addEmployee } from './employeeAction';
+import { addEmployee, fetchEmployees, updateEmployee } from './employeeAction';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const AddEmployeeModal = ({ open, handleClose }) => {
+const AddEmployeeModal = ({ open, handleClose, employeeData }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const [formData, setFormData] = useState({
@@ -32,17 +32,18 @@ const AddEmployeeModal = ({ open, handleClose }) => {
     const [emailError, setEmailError] = useState(false);
     const [dateOfBirthError, setDobError] = useState(false);
 
+    useEffect(() => {
+        if (employeeData._id) {
+            setFormData(employeeData)
+        }
+    }, [employeeData])
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         setFormData({ ...formData, [name]: value });
 
         if (name === 'email') {
             setEmailError(!validateEmail(value));
-        }
-
-        if (name === 'dateOfBirth') {
-            setDobError(isFutureDate(value));
         }
     };
 
@@ -67,6 +68,13 @@ const AddEmployeeModal = ({ open, handleClose }) => {
             }
         }));
     };
+    const handlePhotoChange = (event) => {
+        console.log("files", event.target.files[0])
+        setFormData(prevState => ({
+            ...prevState,
+            photo: event.target.files[0]
+        }));
+    };
 
     const handleSubmit = () => {
         if (!formData.name || !formData.email || !formData.dateOfBirth) {
@@ -82,8 +90,13 @@ const AddEmployeeModal = ({ open, handleClose }) => {
             setDobError(true);
             return;
         }
-
-        dispatch(addEmployee(formData));
+        if (employeeData._id) {
+            dispatch(updateEmployee(formData, employeeData._id));
+        }
+        else {
+            dispatch(addEmployee(formData));
+        }
+        dispatch(fetchEmployees())
         handleClose();
         setFormData({
             name: '',
@@ -144,7 +157,6 @@ const AddEmployeeModal = ({ open, handleClose }) => {
                             value={formData.dateOfBirth}
                             onChange={handleChange}
                             fullWidth
-                            required
                             error={dateOfBirthError}
                             helperText={dateOfBirthError ? 'Date of birth cannot be a future date' : ''}
                         />
@@ -181,8 +193,8 @@ const AddEmployeeModal = ({ open, handleClose }) => {
                             label="photo"
                             type="file"
                             name="photo"
-                            value={formData.photo}
-                            onChange={handleChange}
+                            // value={formData.photo}
+                            onChange={handlePhotoChange}
                             fullWidth
                         />
                     </form>

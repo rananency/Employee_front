@@ -15,6 +15,7 @@ const axiosWithToken = axios.create({
 });
 export const FETCH_EMPLOYEES_SUCCESS = 'FETCH_EMPLOYEES_SUCCESS';
 export const ADD_EMPLOYEE_SUCCESS = 'ADD_EMPLOYEE_SUCCESS';
+export const UPDATE_EMPLOYEE_SUCCESS = 'UPDATE_EMPLOYEE_SUCCESS';
 export const DELETE_EMPLOYEE_SUCCESS = 'DELETE_EMPLOYEE_SUCCESS';
 
 export const fetchEmployeesSuccess = (employees) => ({
@@ -24,6 +25,11 @@ export const fetchEmployeesSuccess = (employees) => ({
 
 export const addEmployeeSuccess = (employee) => ({
     type: ADD_EMPLOYEE_SUCCESS,
+    payload: employee,
+});
+
+export const updateEmployeeSuccess = (employee) => ({
+    type: UPDATE_EMPLOYEE_SUCCESS,
     payload: employee,
 });
 
@@ -54,10 +60,21 @@ export const addEmployee = (employee) => {
     };
 };
 
-export const deleteEmployee = (index) => {
+export const updateEmployee = (employee, empid) => {
     return async (dispatch) => {
         try {
-            const response = await axiosWithToken.delete(`http://localhost:4000/v1/employee/${index}`);
+            const response = await axiosWithToken.put(`http://localhost:4000/v1/employee/${empid}`, employee);
+            dispatch(addEmployeeSuccess(response.data));
+        } catch (error) {
+            console.error('Error adding employee:', error);
+        }
+    };
+};
+
+export const deleteEmployee = (empid) => {
+    return async (dispatch) => {
+        try {
+            const response = await axiosWithToken.delete(`http://localhost:4000/v1/employee/${empid}`);
             dispatch(deleteEmployeeSuccess(response));
         } catch (error) {
             console.error('Error deleting employee:', error);
