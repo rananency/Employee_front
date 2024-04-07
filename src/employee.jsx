@@ -32,6 +32,7 @@ const Employee = () => {
     };
 
     const handleCloseModal = () => {
+        setEmployeeData({})
         setOpenModal(false);
     };
 

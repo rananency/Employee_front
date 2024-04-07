@@ -35,6 +35,20 @@ const AddEmployeeModal = ({ open, handleClose, employeeData }) => {
     useEffect(() => {
         if (employeeData._id) {
             setFormData(employeeData)
+        } else {
+            setFormData({
+                name: '',
+                age: '',
+                email: '',
+                dateOfBirth: '',
+                address: {
+                    street: '',
+                    city: '',
+                    state: '',
+                    zip: ''
+                },
+                photo: null,
+            })
         }
     }, [employeeData])
 
@@ -204,7 +218,7 @@ const AddEmployeeModal = ({ open, handleClose, employeeData }) => {
                         Cancel
                     </Button>
                     <Button onClick={handleSubmit} color="primary" disabled={hasError}>
-                        Add
+                        {employeeData._id ? "Update" : "Add"}
                     </Button>
                 </DialogActions>
             </Dialog>
